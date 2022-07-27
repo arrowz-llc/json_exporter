@@ -15,6 +15,7 @@ package exporter
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -22,6 +23,8 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
@@ -145,7 +148,39 @@ func NewJSONFetcher(ctx context.Context, logger log.Logger, m config.Module, tpl
 	}
 }
 
+func ReadLocalJSON(target string) ([]byte, error) {
+	absPath, _ := filepath.Abs(target)
+
+	jsonFile, err := os.Open(absPath)
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	fmt.Printf("Successfully Opened %v", target)
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+
+	byteValue, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	var result map[string]interface{}
+	json.Unmarshal([]byte(byteValue), &result)
+
+	fmt.Println(result)
+
+	return byteValue, nil
+}
+
 func (f *JSONFetcher) FetchJSON(endpoint string) ([]byte, error) {
+
+	if endpoint == "gala-local" {
+		return ReadLocalJSON("/opt/gala-headless-node/logs/gala-node-stats.json")
+	}
+
 	httpClientConfig := f.module.HTTPClientConfig
 	client, err := pconfig.NewClientFromConfig(httpClientConfig, "fetch_json", pconfig.WithKeepAlivesDisabled(), pconfig.WithHTTP2Disabled())
 	if err != nil {
