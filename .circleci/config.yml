@@ -30,8 +30,7 @@ workflows:
               only: /.*/
       - prometheus/publish_master:
           context: org-context
-          docker_hub_organization: prometheuscommunity
-          quay_io_organization: prometheuscommunity
+          docker_hub_organization: arrowz
           requires:
             - test
             - build
@@ -40,8 +39,7 @@ workflows:
               only: master
       - prometheus/publish_release:
           context: org-context
-          docker_hub_organization: prometheuscommunity
-          quay_io_organization: prometheuscommunity
+          docker_hub_organization: arrowz
           requires:
             - test
             - build
