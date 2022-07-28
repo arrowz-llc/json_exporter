@@ -93,6 +93,14 @@ TLS configuration supported by this exporter can be found at [exporter-toolkit/w
 make build
 ```
 
+Instead, if you just manually want to build a Docker image, use a multi-stage build:
+
+```sh
+docker build -t json-exporter:dev -f ./Dockerfile.multi --build-arg ARCH="amd64" --build-arg OS="linux" .
+```
+
+
+
 ## Sending body content for HTTP `POST`
 
 If `body` paramater is set in config, it will be sent by the exporter as the body content in the scrape request. The HTTP method will also be set as 'POST' in this case.
